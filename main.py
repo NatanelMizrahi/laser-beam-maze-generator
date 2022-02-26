@@ -1,7 +1,8 @@
 import numpy as np
 from itertools import product
 from PIL import Image
-
+import pandas as pd
+import time
 
 
 IDX_CHARMAP = '0123456789ABCDEFGHIJKL'
@@ -9,6 +10,7 @@ ALLOW_WARP = False
 DEBUG = False
 N = 20
 CELL_W = 20
+TURN_PROBABILITY = 10
 ENTRY_POINT = (1, 0)
 ENTRY_DIRECTION = (0, 1)
 
@@ -101,8 +103,8 @@ def fork(grid, x, y, dx, dy, length):
     rdx, rdy = -dy, dx
     keep_straight, fork_left, fork_right = get_random_fork_config(
         keep_straight_options=(0, 1) if is_legal_step(grid, x + dx0, y + dy0, dx0, dy0) else (0,),
-        fork_left_options=(0, 1) if is_legal_step(grid, x + ldx, y + ldy, ldx, ldy) else (0,),
-        fork_right_options=(0, 1) if is_legal_step(grid, x + rdx, y + rdy, rdx, rdy) else (0,),
+        fork_left_options=(0, TURN_PROBABILITY) if is_legal_step(grid, x + ldx, y + ldy, ldx, ldy) else (0,),
+        fork_right_options=(0, TURN_PROBABILITY) if is_legal_step(grid, x + rdx, y + rdy, rdx, rdy) else (0,),
     )
 
     def try_block_diagonals():
@@ -149,15 +151,19 @@ def post_process(grid):
 
 def create_image(grid):
     h, w = grid.shape
+    grid[grid == GOAL] = PATH
+    grid[N, N+1] = PATH
     img = Image.new('L', (h * CELL_W, w * CELL_W))
     pixels = img.load()
 
     for i in range(img.size[0]):
         for j in range(img.size[1]):
             pixels[i, j] = (int)(grid[i// CELL_W][j // CELL_W]) * 255
-
-    img.show()
-    img.save('image.bmp')
+    
+    df = pd.DataFrame(grid)
+    t = time.time()
+    df.to_csv(f'out/maze_{t}.csv')
+    img.save( f'out/img_{t}.bmp')
 
 def main():
     grid, x, y, dx, dy = init()
