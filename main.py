@@ -1,11 +1,14 @@
 import numpy as np
 from itertools import product
+from PIL import Image
+
+
 
 IDX_CHARMAP = '0123456789ABCDEFGHIJKL'
-ALLOW_WARP = True
-DEBUG = True
+ALLOW_WARP = False
+DEBUG = False
 N = 20
-
+CELL_W = 20
 ENTRY_POINT = (1, 0)
 ENTRY_DIRECTION = (0, 1)
 
@@ -144,6 +147,17 @@ def post_process(grid):
     grid[y, x] = GOAL
     grid[grid == UNSET] = PATH
 
+def create_image(grid):
+    h, w = grid.shape
+    img = Image.new('L', (h * CELL_W, w * CELL_W))
+    pixels = img.load()
+
+    for i in range(img.size[0]):
+        for j in range(img.size[1]):
+            pixels[i, j] = (int)(grid[i// CELL_W][j // CELL_W]) * 255
+
+    img.show()
+    img.save('image.bmp')
 
 def main():
     grid, x, y, dx, dy = init()
@@ -153,6 +167,8 @@ def main():
         add_step(grid, x, y, dx, dy, length)
     post_process(grid)
     draw(grid)
+    create_image(grid)
+    return grid
 
-
-main()
+if __name__ == "__main__":
+    main()
