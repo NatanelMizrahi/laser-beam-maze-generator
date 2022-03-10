@@ -174,13 +174,14 @@ def generate_grid():
         x, y, dx, dy, length = BFS_steps_queue.pop(0)
         add_step(grid, x, y, dx, dy, length)
     post_process(grid)
-    draw(grid)
+    if DEBUG:
+        draw(grid)
     create_image(grid)
     return grid
 
 def main():
     for i in range(NUM_MAZES):
-        grid_generate_grid();
+        generate_grid();
 
 if __name__ == "__main__":
     main()
