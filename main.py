@@ -10,9 +10,11 @@ ALLOW_WARP = False
 DEBUG = False
 N = 20
 CELL_W = 20
-TURN_PROBABILITY = 10
+TURN_PROBABILITY = 12
 ENTRY_POINT = (1, 0)
 ENTRY_DIRECTION = (0, 1)
+
+NUM_MAZES = 1000
 
 START = 3
 GOAL = 2
@@ -165,7 +167,7 @@ def create_image(grid):
     df.to_csv(f'out/maze_{t}.csv')
     img.save( f'out/img_{t}.bmp')
 
-def main():
+def generate_grid():
     grid, x, y, dx, dy = init()
     BFS_steps_queue.append((x, y, dx, dy, 0))
     while BFS_steps_queue:
@@ -175,6 +177,10 @@ def main():
     draw(grid)
     create_image(grid)
     return grid
+
+def main():
+    for i in range(NUM_MAZES):
+        grid_generate_grid();
 
 if __name__ == "__main__":
     main()
